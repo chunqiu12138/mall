@@ -1,5 +1,5 @@
 ### mall商城项目
-`SpringBoot` `SpringSecurity` `Mybatis` `Redis` `Elasticsearch` `MyBatisGenerator` `Swagger-UI`
+`SpringBoot` `SpringSecurity` `MySQL`  `MyBatis` `Redis` `Elasticsearch` `Swagger-UI`
 
 - 实现了mall商城项目后台的登录管理以及商品高效搜索
   - 基于 SpringSecurity + JWT ，实现前后端分离的单点登录，并采用RABC模型实现后台管理员和用户的权限控制
