@@ -40,5 +40,10 @@ public class RedisServiceImpl implements RedisService {
     public Long increment(String key, long delta) {
         return stringRedisTemplate.opsForValue().increment(key,delta);
     }
+
+    @Override
+    public Boolean hasKey(String key) {
+        return stringRedisTemplate.hasKey(key);
+    }
 }
 

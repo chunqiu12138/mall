@@ -31,5 +31,6 @@ public interface RedisService {
      */
     Long increment(String key, long delta);
 
+    Boolean hasKey(String key);
 }
 

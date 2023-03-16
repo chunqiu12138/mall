@@ -1,9 +1,13 @@
 package com.chunqiu.mall.controller;
 
+
 import com.chunqiu.mall.common.CommonPage;
 import com.chunqiu.mall.common.CommonResult;
 import com.chunqiu.mall.mbg.model.PmsBrand;
 import com.chunqiu.mall.service.PmsBrandService;
+import com.chunqiu.mall.service.RedisService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -25,6 +30,10 @@ import java.util.List;
 public class PmsBrandController {
     @Autowired
     private PmsBrandService demoService;
+    @Autowired
+    ObjectMapper objectMapper;
+    @Autowired
+    RedisService redisService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PmsBrandController.class);
 
@@ -39,7 +48,29 @@ public class PmsBrandController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseBody
     public CommonResult<PmsBrand> brand(@PathVariable("id") Long id) {
-        return CommonResult.success(demoService.getBrand(id));
+        PmsBrand brand = null;
+        String key = new String("brand:" + id);
+        //如果缓存命中，则取出
+        if(redisService.hasKey(key)) {
+            try {
+                brand = (PmsBrand) objectMapper.readValue(redisService.get(key), PmsBrand.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //未命中，从数据中取出，设置到缓存，并设置过期时间
+        else {
+            brand = demoService.getBrand(id);
+            //设置缓存
+            try {
+                redisService.set(key, objectMapper.writeValueAsString(brand));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            //设置过期时间
+            redisService.expire(key, 30);
+        }
+        return CommonResult.success(brand);
     }
 
     @PreAuthorize("hasAuthority('pms:brand:read')")
@@ -85,8 +116,12 @@ public class PmsBrandController {
     @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
     @ResponseBody
     public CommonResult updateBrand(@PathVariable("id") Long id, @RequestBody PmsBrand pmsBrandDto, BindingResult result) {
+        //id对应redis的key
+        String key = new String("brand:" + id);
         CommonResult commonResult;
         int count = demoService.updateBrand(id, pmsBrandDto);
+        //删除缓存
+        redisService.remove(key);
         if (count == 1) {
             commonResult = CommonResult.success(pmsBrandDto);
             LOGGER.debug("updateBrand success:{}", pmsBrandDto);
@@ -96,6 +131,4 @@ public class PmsBrandController {
         }
         return commonResult;
     }
-
-
 }
