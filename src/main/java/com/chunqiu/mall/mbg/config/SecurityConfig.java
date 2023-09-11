@@ -1,4 +1,4 @@
-package com.chunqiu.mall.config;
+package com.chunqiu.mall.mbg.config;
 
 import com.chunqiu.mall.component.JwtAuthenticationTokenFilter;
 import com.chunqiu.mall.component.RestAuthenticationEntryPoint;

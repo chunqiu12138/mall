@@ -1,4 +1,4 @@
-package com.chunqiu.mall.config;
+package com.chunqiu.mall.mbg.config;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Configuration;

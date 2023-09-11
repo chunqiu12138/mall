@@ -21,7 +21,6 @@ import java.util.List;
 
 /**
  * 商品搜索管理Service实现类
- * Created by macro on 2018/6/19.
  */
 @Service
 public class EsProductServiceImpl implements EsProductService {
